@@ -1,13 +1,13 @@
-%%%-------------------------------------------------------------------
-%%% @author macbook
-%%% @copyright (C) 2023, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 29. авг. 2023 14:01
-%%%-------------------------------------------------------------------
 -module(l3_task2).
--author("macbook").
 
-%% API
--export([]).
+-export([words/1]).
+
+words(BinText) ->
+  words(BinText, <<>>, []).
+
+words(<<32, Rest/binary>>, Word, Acc) ->
+  words(Rest, <<>>, [Word | Acc]);
+words(<<X/utf8, Rest/binary>>, Word, Acc) ->
+  words(Rest, <<Word/binary, X>>, Acc);
+words(<<>>, Word, Acc) ->
+  lists:reverse([Word | Acc]).
