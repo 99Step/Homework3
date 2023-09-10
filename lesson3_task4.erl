@@ -18,7 +18,10 @@ decode_map(<<X, Rest/binary>>, Map) when X =:= 10 orelse X =:= 32 ->
 decode_map(<<"}">>, Map) ->
   Map;
 decode_map(<<"}", Rest/binary>>, Map) ->
-  {Map, Rest}.
+  case delete(Rest) of
+    <<"">> -> Map;
+    Rest1 -> {Map, Rest1}
+  end.
 
 decode_proplist(<<",", Rest/binary>>, PropList) ->
   {Key, Value, Rest1} = decode(Rest, <<>>, <<>>, proplist),
@@ -31,7 +34,10 @@ decode_proplist(<<X, Rest/binary>>, PropList) when X =:= 10 orelse X =:= 32 ->
 decode_proplist(<<"}">>, PropList) ->
   lists:reverse(PropList);
 decode_proplist(<<"}", Rest/binary>>, PropList) ->
-  {lists:reverse(PropList), Rest}.
+  case delete(Rest) of
+    <<"">> -> lists:reverse(PropList);
+    Rest1 -> {lists:reverse(PropList), Rest1}
+  end.
 
 decode(<<"'", Rest/binary>>, <<>>, <<>> = Value, Flag) ->
   {Key, Rest1} = decode_name(Rest, <<>>),
@@ -80,3 +86,8 @@ decode_number(<<",", _/binary>> = Rest, Number) ->
   {binary_to_integer(Number), Rest};
 decode_number(<<X:1/binary, Rest/binary>>, Number) ->
   decode_number(Rest, <<Number/binary, X/binary>>).
+
+delete(<<X, Rest/binary>>) when X =:= 10 orelse X =:= 32 ->
+  delete(Rest);
+delete(Rest) ->
+  Rest.
