@@ -1,4 +1,4 @@
--module(l3_task4).
+-module(lesson3_task4).
 
 -export([decode/2]).
 
